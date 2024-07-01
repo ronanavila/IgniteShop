@@ -1,21 +1,25 @@
-import { HomeContainer, Product } from "@/styles/pages/home";
 import Image from "next/image";
-import { useKeenSlider } from "keen-slider/react";
-import "keen-slider/keen-slider.min.css";
-import { stripe } from "@/lib/stripe";
-import { GetServerSideProps, GetStaticProps } from "next";
-import Stripe from "stripe";
+import Head from "next/head";
+import { GetStaticProps } from "next";
 import Link from "next/link";
+
+import { useKeenSlider } from "keen-slider/react";
+
+import { stripe } from "../lib/stripe";
+import { HomeContainer, Product } from "../styles/pages/home";
+
+import "keen-slider/keen-slider.min.css";
+import Stripe from "stripe";
 
 interface HomeProps {
   products: {
     id: string;
     name: string;
     imageUrl: string;
-    url: string;
-    price: number;
+    price: string;
   }[];
 }
+
 export default function Home({ products }: HomeProps) {
   const [sliderRef] = useKeenSlider({
     slides: {
@@ -26,17 +30,21 @@ export default function Home({ products }: HomeProps) {
 
   return (
     <>
+      <Head>
+        <title>Home | Ignite Shop</title>
+      </Head>
+
       <HomeContainer ref={sliderRef} className="keen-slider">
         {products.map((product) => {
           return (
-            <Link key={product.id} href={`/product/${product.id}`}>
+            <Link
+              href={`/product/${product.id}`}
+              key={product.id}
+              prefetch={false}
+            >
               <Product className="keen-slider__slide">
-                <Image
-                  src={product.imageUrl}
-                  alt={""}
-                  width={520}
-                  height={480}
-                />
+                <Image src={product.imageUrl} width={520} height={480} alt="" />
+
                 <footer>
                   <strong>{product.name}</strong>
                   <span>{product.price}</span>
@@ -62,7 +70,6 @@ export const getStaticProps: GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      url: product.url,
       price: price.unit_amount
         ? new Intl.NumberFormat("pt-BR", {
             style: "currency",
@@ -76,6 +83,6 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       products,
     },
-    revalidate: 60 * 60 * 2,
+    revalidate: 60 * 60 * 2, // 2 hours,
   };
 };
