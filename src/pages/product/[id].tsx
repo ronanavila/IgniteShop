@@ -7,7 +7,6 @@ import {
 import { GetStaticPaths, GetStaticProps } from "next";
 import Stripe from "stripe";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 interface ProductProps {
   product: {
@@ -16,10 +15,12 @@ interface ProductProps {
     imageUrl: string;
     price: string;
     description: string;
+    defaultPriceID: string;
   };
 }
 
 export default function Product({ product }: ProductProps) {
+  function handleBuyProduct() {}
   return (
     <ProductContainer>
       <ImageContainer>
@@ -63,6 +64,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
             }).format(price.unit_amount / 100)
           : 0,
         description: product.description,
+        defaultPriceID: price.id,
       },
     },
     revalidate: 60 * 60 * 1,
